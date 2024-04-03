@@ -1,56 +1,67 @@
-import { useEffect, useState } from 'react';
-import ContactList from './components/contactList/ContactList';
-import SearchBox from './components/searchBox/SearchBox';
-import ContactForm from './components/contactForm/ContactForm.jsx';
-import { nanoid } from 'nanoid';
-import './App.css';
+import { useState, useEffect } from "react";
+import { SearchBar } from "./components/searchBar/SearchBar";
+import { fetchImg } from "./components/services/Api";
+import "./App.css";
+
+import { ImageGallery } from "./components/imageGallery/ImageGallery";
+import { Loader } from "./components/loader/Loader";
+import ErrorMessage from './components/errorMessage/ErrorMessage';
+import { Toaster } from "react-hot-toast";
+import LoadMoreButton from './components/loadMoreBtn/LoadMoreBtn';
+
 
 function App() {
-  const initialInfo = [
-    { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-    { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-    { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-    { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-  ];
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [img, setImg] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
-  const [inputValue, setInputValue] = useState('');
-  const [contacts, setContacts] = useState(() => {
-    const savedContacts = localStorage.getItem('contact');
-    return savedContacts ? JSON.parse(savedContacts) : initialInfo;
-  });
+  const searchImg = async (newQuery) => {
+    setQuery(`${Date.now()}/${newQuery}`);
+    setPage(1);
+    setImg([]);
+  };
+
+  const handleLoadMore = () => {
+    setPage(page + 1);
+    console.log(page);
+  };
 
   useEffect(() => {
-    localStorage.setItem('contact', JSON.stringify(contacts), [contacts]);
-  }, [contacts]);
+    if (query === "") {
+      return;
+    }
 
-  const addContact = contact => {
-    const newContact = {
-      id: nanoid(),
-      name: contact.name,
-      number: contact.tel,
-    };
-    setContacts([...contacts, newContact]);
-  };
+    async function fetchData() {
+      try {
+        setLoading(true);
+        setError(false);
+        const fetchedData = await fetchImg(query.split("/")[1], page);
 
-  const deleteContact = id => {
-    setContacts(contacts.filter(contact => contact.id !== id));
-  };
+        setImg((prevImg) => [...prevImg, ...fetchedData.results]);
 
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(inputValue.toLowerCase())
-  );
+        setIsVisible(fetchedData.total_pages > page);
+      } catch (error) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [query, page]);
 
   return (
     <>
-      <div className="container">
-        <h1 className="title">Phonebook</h1>
-        <ContactForm onSubmit={addContact} />
-        <SearchBox inputValue={inputValue} setInputValue={setInputValue} />
-        <ContactList
-          filteredContacts={filteredContacts}
-          deleteContact={deleteContact}
-        />
-      </div>
+      <SearchBar onSubmit={searchImg} />
+      {error && <ErrorMessage />}
+      {img.length > 0 && <ImageGallery items={img} />}
+      {loading && <Loader />}
+      {img.length > 0 && !loading && isVisible && (
+        <LoadMoreButton onClick={handleLoadMore} />
+      )}
+      <Toaster position="bottom-center" />
     </>
   );
 }
