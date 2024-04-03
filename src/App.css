@@ -1,0 +1,12 @@
+#root {
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.container {
+  text-align: left;
+}
+.title {
+  margin-bottom: 20px;
+}
