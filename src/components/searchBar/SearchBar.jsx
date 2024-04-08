@@ -1,12 +1,14 @@
-import toast from "react-hot-toast";
-import css from "./SearchBar.module.css";
-import { TbPhotoSearch } from "react-icons/tb";
-export const SearchBar = ({ onSubmit }) => {
-  const handleSubmit = (e) => {
+import toast from 'react-hot-toast';
+import css from './SearchBar.module.css';
+import { TbPhotoSearch } from 'react-icons/tb';
+import { useState } from 'react';
+
+export const SearchBar = ({ onSubmit, setCurrentIndex }) => {
+  const handleSubmit = e => {
     e.preventDefault();
 
-    if (e.target.elements.query.value.trim() === "") {
-      toast.error("Please enter a request");
+    if (e.target.elements.query.value.trim() === '') {
+      toast.error('Please enter a request');
       return;
     }
 
@@ -23,7 +25,7 @@ export const SearchBar = ({ onSubmit }) => {
           placeholder="Search images and photos"
         />
         <button className={css.button} type="submit">
-          <TbPhotoSearch size="24" />
+          <TbPhotoSearch size="25" />
         </button>
       </form>
     </header>

@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { ImageModal } from "../imageModal/ImageModal";
-import css from './ImageCard.module.css'
+import { useState } from 'react';
+import { ImageModal } from '../imageModal/ImageModal';
+import css from './ImageCard.module.css';
 export const ImageCard = ({ item }) => {
   const [modalIsOpen, setIsOpen] = useState(false);
 
@@ -13,7 +13,12 @@ export const ImageCard = ({ item }) => {
   }
   return (
     <div className={css.imgItem}>
-      <img className={css.img} src={item.urls.small} alt={item.description} onClick={openModal} />
+      <img
+        className={css.img}
+        src={item.urls.small}
+        alt={item.description}
+        onClick={openModal}
+      />
       <ImageModal item={item} isOpen={modalIsOpen} closeModal={closeModal} />
     </div>
   );
